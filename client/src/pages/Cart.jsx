@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { useAppContext } from '../context/appContext';
+import { useAppContext } from '../context/AppContext';
 import { assets, dummyAddress } from '../assets/assets';
 
 const Cart = () => {
@@ -98,7 +98,7 @@ const Cart = () => {
                                         {address.street}, {address.city}, {address.state}, {address.country}
                                     </p>
                                 ))}
-                                <p onClick={() => navigate("/")} className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10">
+                                <p onClick={() => navigate("/add-address")} className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10">
                                     Add address
                                 </p>
                             </div>
