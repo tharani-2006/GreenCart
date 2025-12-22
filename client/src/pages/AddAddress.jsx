@@ -6,8 +6,6 @@ import { useState } from 'react'
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
     <input className='w-full px-2 py-2.5 border border-gray-500/30 rounded outline-none text-gray-500 focus:border-primary transition' type={type} placeholder={placeholder} name={name} onChange={handleChange} value={address[name]} />
 )
-
-
 const AddAddress = () => {
 
     const [address, setAddress] = useState({
@@ -32,7 +30,7 @@ const AddAddress = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
-        //form submit logic
+        //form submit logic need to be implemented
     }
 
     return (
