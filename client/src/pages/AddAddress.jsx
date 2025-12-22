@@ -40,11 +40,28 @@ const AddAddress = () => {
             <div className='flex flex-col-reverse md:flex-row justify-between mt-10'>
                 <div className=' flex-1 max-w-md'>
                     <form onSubmit={onSubmitHandler} className='space-y-3 mt-6 text-sm'>
-                        <div>
+
+                        <div className='grid grid-cols-2 gap-4'>
                             <InputField handleChange={handleChange} address={address} name='firstname' type='text' placeholder='First Name' />
                             <InputField handleChange={handleChange} address={address} name='lastname' type='text' placeholder='Last Name' />
-
                         </div>
+
+                        <InputField handleChange={handleChange} address={address} name='email' type='email' placeholder='Email Address' />
+                        <InputField handleChange={handleChange} address={address} name='street' type='text' placeholder='Street Address' />
+
+                        <div className='grid grid-cols-2 gap-4'>
+                            <InputField handleChange={handleChange} address={address} name='city' type='text' placeholder='City' />
+                            <InputField handleChange={handleChange} address={address} name='state' type='text' placeholder='State/Province' />
+                        </div>
+
+                        <div className='grid grid-cols-2 gap-4'>
+                            <InputField handleChange={handleChange} address={address} name='zipcode' type='text' placeholder='Zip Code/Postal Code' />
+                            <InputField handleChange={handleChange} address={address} name='country' type='text' placeholder='Country/Region' />
+                        </div>
+
+                        <InputField handleChange={handleChange} address={address} name='phone' type='tel' placeholder='Phone Number' />
+
+                        <button type='submit' className='w-full bg-primary text-white py-3 mt-6 cursor-pointer uppercase hover:bg-primary/90 transition'>Save Address</button>
                     </form>
                 </div>
                 <img className='md:mr-16 mb-16 md:mt-0' src={assets.add_address_iamge} alt="Add Address" />
