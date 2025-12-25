@@ -26,12 +26,14 @@ const SellerLogin = () => {
                     <div className='w-full'>
                         <p>Email</p>
                         <input type="email"
+                        onChange={(e) => setEmail(e.target.value)} value={email}
                         className='border border-gray-200 rounded w-full p-2 mt-1 outline-primary'
                         placeholder='Enter your email' required/>
                     </div>
                     <div className='w-full'>
                         <p>Password</p>
                         <input type="password"
+                        onChange={(e) => setPassword(e.target.value)} value={password}
                         className='border border-gray-200 rounded w-full p-2 mt-1 outline-primary'
                         placeholder='Enter your password' required/>
                     </div>
