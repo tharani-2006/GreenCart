@@ -1,9 +1,15 @@
 import cookieParser from 'cookie-parser';
 import express from 'express'
 import cors from 'cors';
+import connectDB from './configs/db.js';
+import dotenv from 'dotenv';
+
+dotenv.config(); 
 
 const app = express();
 const port = process.env.PORT || 4000
+
+await connectDB()
 
 //Allow mulitple origins
 const allowedOrigins = ['http://localhost:5173']
