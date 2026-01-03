@@ -114,3 +114,68 @@ export const logout = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 }
+
+//Add to Cart : /api/user/add-to-cart
+export const addToCart = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const { itemId } = req.body;
+
+        if(!itemId) {
+            return res.json({success: false, message: "Item ID is required"});
+        }
+
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.json({success: false, message: "User not found"});
+        }
+
+        let cartItems = user.cartItems || {};
+        if(cartItems[itemId]) {
+            cartItems[itemId] += 1;
+        } else {
+            cartItems[itemId] = 1;
+        }
+
+        user.cartItems = cartItems;
+        await user.save();
+
+        return res.json({success: true, message: "Item added to cart", cartItems});
+    } catch (error) {
+        console.error("Error in adding to cart:", error);
+        res.status(500).json({success: false, message: "Server Error"});
+    }
+};
+
+//Remove from Cart : /api/user/remove-from-cart
+export const removeFromCart = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const { itemId } = req.body;
+
+        if(!itemId) {
+            return res.json({success: false, message: "Item ID is required"});
+        }
+
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.json({success: false, message: "User not found"});
+        }
+
+        let cartItems = user.cartItems || {};
+        if(cartItems[itemId]) {
+            cartItems[itemId] -= 1;
+            if(cartItems[itemId] <= 0) {
+                delete cartItems[itemId];
+            }
+        }
+
+        user.cartItems = cartItems;
+        await user.save();
+
+        return res.json({success: true, message: "Item removed from cart", cartItems});
+    } catch (error) {
+        console.error("Error in removing from cart:", error);
+        res.status(500).json({success: false, message: "Server Error"});
+    }
+};
