@@ -14,6 +14,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000
 
+//connect to db
 await connectDB()
 
 //Allow mulitple origins

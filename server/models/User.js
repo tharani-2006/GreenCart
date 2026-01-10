@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,6 +15,5 @@ const userSchema = new mongoose.Schema({
     },
     cartItems: {type: Object, default: {}},
 }, { minimize: false });
-
 const User = mongoose.models.user || mongoose.model("User", userSchema);
 export default User;
