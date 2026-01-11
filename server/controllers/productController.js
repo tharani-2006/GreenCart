@@ -1,38 +1,27 @@
 import Product from "../models/Product.js";
-import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+import { v2 as cloudinary } from "cloudinary";
 
 // Add Product : /api/product/add
 export const addProduct = async (req, res) => {
     try {
         const { name, description, category, price, offerPrice } = req.body;
-        const files = req.files;
+        const images = req.files;
 
         if(!name || !description || !category || !price || !offerPrice) {
             return res.json({success: false, message: "All fields are required"});
-        }
-
-        if(!files || files.length === 0) {
-            return res.json({success: false, message: "At least one image is required"});
-        }
+        }        
 
         // Upload images to Cloudinary
-        const imageUrls = [];
-        for(const file of files) {
-            const result = await cloudinary.uploader.upload(file.path, {
+        let imageUrls = [];
+        for(const item of images) {
+            const result = await cloudinary.uploader.upload(item.path, {
                 folder: "greenCart/products",
+                resource_type: 'image'
             });
             imageUrls.push(result.secure_url);
-            // Delete file from server
-            fs.unlinkSync(file.path);
-        }
+            fs.unlinkSync(item.path);
+        } 
 
         const product = await Product.create({
             name,
@@ -96,6 +85,7 @@ export const updateProduct = async (req, res) => {
             for(const file of files) {
                 const result = await cloudinary.uploader.upload(file.path, {
                     folder: "greenCart/products",
+                    resource_type: 'image'
                 });
                 imageUrls.push(result.secure_url);
                 fs.unlinkSync(file.path);
