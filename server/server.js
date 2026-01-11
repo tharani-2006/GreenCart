@@ -18,7 +18,7 @@ const port = process.env.PORT || 4000
 
 //connect to db
 await connectDB()
-await connectCloudinary
+await connectCloudinary()
 
 //Allow mulitple origins
 const allowedOrigins = ['http://localhost:5173']

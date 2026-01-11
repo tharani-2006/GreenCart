@@ -3,7 +3,7 @@ import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 
 // Add Product : /api/product/add
-export const addProduct = async (req, res) => {
+export const addProduct = async (req, res)=>{
     try {
         const { name, description, category, price, offerPrice } = req.body;
         const images = req.files;
@@ -11,6 +11,10 @@ export const addProduct = async (req, res) => {
         if(!name || !description || !category || !price || !offerPrice) {
             return res.json({success: false, message: "All fields are required"});
         }        
+
+        if(!images || images.length === 0) {
+            return res.json({success: false, message: "At least one image is required"});
+        }
 
         // Upload images to Cloudinary
         let imageUrls = [];
@@ -32,10 +36,10 @@ export const addProduct = async (req, res) => {
             image: imageUrls,
         });
 
-        return res.json({success: true, message: "Product added successfully", product});
+        res.json({success: true, message: "Product added successfully", product});
     } catch (error) {
-        console.error("Error in adding product:", error);
-        res.status(500).json({success: false, message: "Server Error"});
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
     }
 };
 
