@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 // Login Seller : /api/seller/login
 
-export const sellerLogin = async (req, res) => {
+export const sellerLogin = async (req, res)=>{
     try {
         const {email, password} = req.body;
 
@@ -14,37 +14,37 @@ export const sellerLogin = async (req, res) => {
                 sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             });
-            return res.json({success: true, message: "Seller logged in successfully"});
+            res.json({success: true, message: "Seller logged in successfully"});
         } else {
-            return res.json({success: false, message: "Invalid email or password"});
+            res.json({success: false, message: "Invalid email or password"});
         }
     } catch (error) {
-        console.error("Error in seller login:", error);
-        res.status(500).json({success: false, message: "Server Error"});
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
     }
 }
 
 // Seller isAuth : /api/seller/is-auth
-export const isSellerAuth = async (req, res) => {
+export const isSellerAuth = async (req, res)=>{
     try{
-        return res.json({success: true, message: "Seller is authenticated"});
+        res.json({success: true, message: "Seller is authenticated"});
     } catch (error) {
-        console.error("Error in seller isAuth:", error);
-        res.status(500).json({success: false, message: "Server Error"});
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
     }
 }
 
 //Logout Seller : /api/seller/logout
-export const sellerLogout = async (req, res) => {
+export const sellerLogout = async (req, res)=>{
     try {
         res.clearCookie("sellerToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         });
-        return res.json({success: true, message: "Seller logged out successfully"});
+        res.json({success: true, message: "Seller logged out successfully"});
     } catch (error) {
-        console.error("Error in seller logout:", error);
-        res.status(500).json({success: false, message: "Server Error"});
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
      }
 }
