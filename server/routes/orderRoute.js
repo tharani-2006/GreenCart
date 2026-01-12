@@ -5,11 +5,11 @@ import authSeller from '../middlewares/authSeller.js';
 
 const orderRouter = express.Router();
 
-// User routes (protected)
+// User routes (protected with middleware)
 orderRouter.post('/cod', authUser, placeOrderCOD);
 orderRouter.get('/user', authUser, getUserOrders);
 
-// Seller routes (protected)
+// Seller routes (protected with middleware)
 orderRouter.get('/seller', authSeller, getAllOrders);
 
 export default orderRouter;
