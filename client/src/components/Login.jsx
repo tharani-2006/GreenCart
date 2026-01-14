@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
-  const { setShowUserLogin, setUser } = useAppContext();
-  const navigate = useNavigate();
+  const { setShowUserLogin, setUser , axios,navigate} = useAppContext();
 
   // state for login or register
   const [state, setState] = React.useState("login");
@@ -23,14 +22,25 @@ const Login = () => {
 
   // handle submit form
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    try{
+      e.preventDefault();
 
-    setUser({
-      email: "thar@gmail.com",
-      name: "thar",
-    })
-    setShowUserLogin(false);
-    navigate("/");
+      const {data} = await axios.post(`/api/user/${state}`, {
+        name, email, password
+      });
+      if(data.success){
+        setUser(data.user);
+        setShowUserLogin(false);
+        navigate("/");
+      }else{
+        toast.error(data.message);
+      }
+
+    }
+    catch(error){
+      toast.error(error.message);
+    }
+
 
   };
 
