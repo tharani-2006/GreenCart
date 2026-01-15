@@ -1,6 +1,7 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
+import { useAppContext } from '../context/AppContext'
 
 //Input Field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -8,6 +9,7 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
 )
 const AddAddress = () => {
 
+    const { axios, user, navigate } = useAppContext();
     const [address, setAddress] = useState({
         firstname: '',
         lastname: '',
@@ -29,9 +31,25 @@ const AddAddress = () => {
     }
 
     const onSubmitHandler = async (e) => {
-        e.preventDefault();
-        //form submit logic need to be implemented
+        try{
+            e.preventDefault();
+            const {data} = await axios.post('/api/address/add', {address});
+            if(data.success){
+                toast.success(data.message);
+                navigate('/cart');
+            }else{
+                toast.error(data.message);
+            }
+        }catch(error){
+            toast.error(error.message);
+        }
     }
+
+    useEffect(()=> {
+        if(!user){
+            navigate('/cart');
+        }
+    },[user])
 
     return (
         <div className='mt-16 pb-16'>
