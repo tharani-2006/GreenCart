@@ -6,15 +6,7 @@ import { dummyOrders } from '../assets/assets'
 const MyOrders = () => {
 
   const [myOrders, setMyOrders] = useState([])
-  const { currency } = useAppContext();
-
-  const fetchMyOrders = async () => {
-    setMyOrders(dummyOrders)
-  }
-
-  useEffect(() => {
-    fetchMyOrders()
-  }, [])
+  
 
   return (
     <div className='mt-16 pb-16'>
