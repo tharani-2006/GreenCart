@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { assets, dummyAddress } from '../assets/assets';
+import toast from 'react-hot-toast';
 
-const Cart = () => {   
-    const { products,setCartItems ,user, currency, cartItems, removeFromCart, getCartCount, updateCartItem, navigate, getCartAmount , axios } = useAppContext();
+const Cart = () => {
+    const { products, setCartItems, user, currency, cartItems, removeFromCart, getCartCount, updateCartItem, navigate, getCartAmount, axios } = useAppContext();
     const [cartArray, setCartArray] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [showAddress, setShowAddress] = useState(false)
@@ -22,60 +23,67 @@ const Cart = () => {
     }
 
     const getUserAddress = async () => {
-        try{
-            const {data} = await axios.get('/api/address/get');
-            if(data.success){
+        try {
+            const { data } = await axios.get('/api/address/get');
+            if (data.success) {
                 setAddresses(data.addresses);
-                if(data.addresses.length > 0){
+                if (data.addresses.length > 0) {
                     setSelectedAddress(data.addresses[0]);
                 }
-            }else{
+            } else {
                 toast.error(data.message);
             }
-        }catch(error){
+        } catch (error) {
             toast.error(error.message);
         }
     }
 
     const placeOrder = async () => {
-        try{
-            if(!selectedAddress){
+        try {
+            if (!selectedAddress) {
                 toast.error("Please select an address");
                 return;
             }
             //place order with COD
-            if(paymentOption === "COD"){
-                try{
-                    const {data} = await axios.post('/api/order/cod', {
-                        userId: user._id, 
-                        items: cartArray.map(item => ({product: item._id, quantity: item.quantity})), 
+            if (paymentOption === "COD") {
+                try {
+                    const { data } = await axios.post('/api/order/cod', {
+                        userId: user._id,
+                        items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
                         address: selectedAddress._id
                     });
 
-                    if(data.success){
+                    if (data.success) {
                         toast.success(data.message);
                         setCartItems({});
                         navigate('/my-orders');
-                    }else{
+                    } else {
                         toast.error(data.message);
                     }
-                }catch(error){
+                } catch (error) {
                     toast.error(error.message);
                 }
-            }//else{
-            //     //place order with Online Payment
-            //     try{
-            //         const {data} = await axios.post('/api/order/online', {
-            //             userId: user._id,
-            //             items: cartArray, 
-            //             address: selectedAddress
-            //         });
-            //     }
-            //     catch(error){
-            //         toast.error(error.message);
-            //     }
-            // }
-        }catch(error){
+            } else {
+                //place order with Online Payment
+                try {
+                    const { data } = await axios.post('/api/order/stripe', {
+                        userId: user._id,
+                        items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
+                        address: selectedAddress._id
+                    });
+
+                    if (data.success) {
+                        //redirect to stripe checkout
+                        window.location.replace(data.url);
+                    } else {
+                        toast.error(data.message);
+                    }
+                }
+                catch (error) {
+                    toast.error(error.message);
+                }
+            }
+        } catch (error) {
             toast.error(error.message);
         }
     }
@@ -85,11 +93,11 @@ const Cart = () => {
         }
     }, [cartItems, products]);
 
-    useEffect(()=> {
-        if(user){
+    useEffect(() => {
+        if (user) {
             getUserAddress();
         }
-    },[user])
+    }, [user])
 
     return products.length > 0 && cartItems ? (
         <div className="flex flex-col md:flex-row mt-16">
@@ -155,7 +163,7 @@ const Cart = () => {
                         {showAddress && (
                             <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
                                 {addresses.map((address, map) => (
-                                    <p onClick={() => {setSelectedAddress(address); setShowAddress(false)}} className="text-gray-500 p-2 hover:bg-gray-100">
+                                    <p onClick={() => { setSelectedAddress(address); setShowAddress(false) }} className="text-gray-500 p-2 hover:bg-gray-100">
                                         {address.street}, {address.city}, {address.state}, {address.country}
                                     </p>
                                 ))}
