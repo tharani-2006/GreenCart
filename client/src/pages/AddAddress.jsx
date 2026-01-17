@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
 import { useAppContext } from '../context/AppContext'
+import toast from 'react-hot-toast'
 
 //Input Field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -11,8 +12,8 @@ const AddAddress = () => {
 
     const { axios, user, navigate } = useAppContext();
     const [address, setAddress] = useState({
-        firstname: '',
-        lastname: '',
+        firstName: '',
+        lastName: '',
         email: '',
         street: '',
         city: '',
@@ -60,8 +61,8 @@ const AddAddress = () => {
                     <form onSubmit={onSubmitHandler} className='space-y-3 mt-6 text-sm'>
 
                         <div className='grid grid-cols-2 gap-4'>
-                            <InputField handleChange={handleChange} address={address} name='firstname' type='text' placeholder='First Name' />
-                            <InputField handleChange={handleChange} address={address} name='lastname' type='text' placeholder='Last Name' />
+                            <InputField handleChange={handleChange} address={address} name='firstName' type='text' placeholder='First Name' />
+                            <InputField handleChange={handleChange} address={address} name='lastName' type='text' placeholder='Last Name' />
                         </div>
 
                         <InputField handleChange={handleChange} address={address} name='email' type='email' placeholder='Email Address' />

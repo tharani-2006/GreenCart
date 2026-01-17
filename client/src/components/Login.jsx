@@ -1,10 +1,11 @@
 import React from 'react'
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Login = () => {
 
-  const { setShowUserLogin, setUser , axios,navigate} = useAppContext();
+  const { setShowUserLogin, setUser , axios, navigate, fetchUser} = useAppContext();
 
   // state for login or register
   const [state, setState] = React.useState("login");
@@ -29,8 +30,9 @@ const Login = () => {
         name, email, password
       });
       if(data.success){
-        setUser(data.user);
         setShowUserLogin(false);
+        // Fetch user data to get complete user info including cartItems
+        await fetchUser();
         navigate("/");
       }else{
         toast.error(data.message);
@@ -38,7 +40,8 @@ const Login = () => {
 
     }
     catch(error){
-      toast.error(error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(errorMessage);
     }
 
 

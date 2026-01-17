@@ -12,14 +12,19 @@ export const addAddress = async (req, res)=>{
     }
 };
 
-// Get All Addresses : /api/address/all
+// Get All Addresses : /api/address/get
 export const getAddresses = async (req, res)=>{
     try {
         const userId = req.body.userId;
+        
+        if(!userId) {
+            return res.json({success: false, message: "User ID is required"});
+        }
+        
         const addresses = await Address.find({ userId }).sort({ createdAt: -1 });
         res.json({success: true, addresses});
     } catch (error) {
-        console.log(error.message);
+        console.log("Error fetching addresses:", error.message);
         res.json({ success: false, message: error.message });
     }
 };

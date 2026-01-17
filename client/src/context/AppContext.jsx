@@ -1,14 +1,13 @@
 import { createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
-import {dummyProducts} from '../assets/assets'
-import toast from 'react-hot-toast'
-import axios from 'axios'
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
 
-export const AppContext = createContext();
+const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
 
@@ -22,6 +21,7 @@ export const AppContextProvider = ({ children }) => {
 
     const [cartItems, setCartItems] = useState({})
     const [searchQuery, setSearchQuery] = useState({})
+    const [isInitialLoad, setIsInitialLoad] = useState(true)
 
     //fetch seller status
     const fetchSellerStatus = async () => {
@@ -33,7 +33,7 @@ export const AppContextProvider = ({ children }) => {
                 setIsSeller(false);
             }
         }catch(error){
-            console.log(error.message);
+            // Silently handle seller auth check errors
         }
     }
 
@@ -43,17 +43,28 @@ export const AppContextProvider = ({ children }) => {
             const {data} = await axios.get('/api/user/is-auth');
             if(data.success){
                 setUser(data.user);
-                setCartItems(data.user.cartItems);
+                setCartItems(data.user.cartItems || {});
+                setIsInitialLoad(false);
+            } else {
+                setUser(null);
+                setCartItems({});
+                setIsInitialLoad(false);
             }
         }catch(error){
+            const status = error.response?.status;
+            if(status !== 401) {
+                console.error("Error fetching user:", error);
+            }
             setUser(null);
+            setCartItems({});
+            setIsInitialLoad(false);
         }
     }
 
     //fetch All products 
     const fetchProducts = async () => {
         try{
-            const {data} = await axios.get('/api/product/list');
+            const {data} = await axios.get('/api/product/all');
             if(data.success){
                 setProducts(data.products)
             }else{
@@ -66,7 +77,7 @@ export const AppContextProvider = ({ children }) => {
     }
 
     //Add Product to Cart
-    const addToCart = (itemId) => {
+    const addToCart = async (itemId) => {
         let cartData = structuredClone(cartItems)
 
         if(cartData[itemId]){
@@ -76,19 +87,37 @@ export const AppContextProvider = ({ children }) => {
         }
 
         setCartItems(cartData)
+        
+        if(user) {
+            try {
+                await axios.post('/api/user/add-to-cart', { itemId });
+            } catch (error) {
+                // Silently handle cart sync errors
+            }
+        }
+        
         toast.success("Added to cart")
     }
 
     //update cart item Quantity
-    const updateCartItem = (itemId, quantity) => {
+    const updateCartItem = async (itemId, quantity) => {
         let cartData = structuredClone(cartItems)
         cartData[itemId] = quantity
         setCartItems(cartData)
+        
+        if(user) {
+            try {
+                await axios.post('/api/user/update-cart', { itemId, quantity });
+            } catch (error) {
+                // Silently handle cart sync errors
+            }
+        }
+        
         toast.success("Cart updated")
     }
 
     //remove product from cart
-    const removeFromCart = (itemId) => {
+    const removeFromCart = async (itemId) => {
         let cartData = structuredClone(cartItems)
         if(cartData[itemId]){
             cartData[itemId] -= 1;
@@ -97,6 +126,15 @@ export const AppContextProvider = ({ children }) => {
             }
         }
         setCartItems(cartData)
+        
+        if(user) {
+            try {
+                await axios.post('/api/user/remove-from-cart', { itemId });
+            } catch (error) {
+                // Silently handle cart sync errors
+            }
+        }
+        
         toast.success("Removed from cart")
     }
     
@@ -127,30 +165,38 @@ export const AppContextProvider = ({ children }) => {
         fetchSellerStatus()
     },[])
 
-    //update database cart items
     useEffect(()=> {
+        if(isInitialLoad) {
+            return;
+        }
+
         const updateCart = async () => {
             try{
-                const {data} = await axios.post('/api/user/update', {cartItems});
+                const {data} = await axios.post('/api/cart/update', {userId: user._id, cartItems});
                 if(data.success){
-                    toast.success(data.message);
+                    // Cart updated successfully
                 }else{
-                    toast.error(data.message);
+                    if(data.message !== "Invalid token" && data.message !== "Unauthorized access"){
+                        toast.error(data.message);
+                    }
                 }
             }catch(error){
-                toast.error(error.message);
+                const errorMessage = error.response?.data?.message || error.message;
+                if(errorMessage !== "Invalid token" && errorMessage !== "Unauthorized access"){
+                    toast.error(errorMessage);
+                }
             }
         }
-        if(user){
+        if(user && Object.keys(cartItems).length > 0){
             updateCart();
         }
-    },[cartItems])
+    },[cartItems, user, isInitialLoad])
 
     const value = { navigate, user, setUser, isSeller, setIsSeller,
-         showUserLogin, setShowUserLogin ,products, setProducts,
-        products, currency, addToCart, updateCartItem , removeFromCart, cartItems,
+         showUserLogin, setShowUserLogin, products, setProducts,
+        currency, addToCart, updateCartItem, removeFromCart, cartItems,
         searchQuery, setSearchQuery, getCartCount, getCartAmount,
-        axios, fetchProducts, setCartItems,
+        axios, fetchProducts, setCartItems, fetchUser,
     };
 
     return <AppContext.Provider value={value}>

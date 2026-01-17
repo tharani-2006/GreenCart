@@ -9,7 +9,7 @@ export const register = async (req, res) => {
         const { name, email, password } = req.body;
 
         if(!name || !email || !password) {
-            return res.json({succes:false, message: "All fields are required"});
+            return res.json({success: false, message: "All fields are required"});
         }
 
         const existingUser = await User.findOne({ email });
@@ -51,7 +51,7 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
 
         if(!email || !password) {
-            return res.json({succes:false, message: "All fields are required"});
+            return res.json({success: false, message: "All fields are required"});
         }
 
         const user = await User.findOne({ email });

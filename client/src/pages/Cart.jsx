@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { assets, dummyAddress } from '../assets/assets';
+import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const Cart = () => {
     const { products, setCartItems, user, currency, cartItems, removeFromCart, getCartCount, updateCartItem, navigate, getCartAmount, axios } = useAppContext();
+    const location = useLocation();
     const [cartArray, setCartArray] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [showAddress, setShowAddress] = useState(false)
@@ -16,25 +18,59 @@ const Cart = () => {
         let tempArray = [];
         for (const key in cartItems) {
             const product = products.find((item) => item._id === key);
-            product.quantity = cartItems[key];
-            tempArray.push(product);
+            if (product) {
+                product.quantity = cartItems[key];
+                tempArray.push(product);
+            }
         }
         setCartArray(tempArray);
     }
 
     const getUserAddress = async () => {
+        // Only fetch addresses if user is authenticated
+        if (!user || !user._id) {
+            return;
+        }
+
         try {
             const { data } = await axios.get('/api/address/get');
             if (data.success) {
-                setAddresses(data.addresses);
-                if (data.addresses.length > 0) {
-                    setSelectedAddress(data.addresses[0]);
+                const fetchedAddresses = data.addresses || [];
+                setAddresses(fetchedAddresses);
+                // Always set the first address as selected if addresses exist
+                if (fetchedAddresses.length > 0) {
+                    // Use functional update to check current selectedAddress state
+                    setSelectedAddress(prev => {
+                        // If no address is currently selected, or if the selected address is not in the list, select the first one
+                        if (!prev || !fetchedAddresses.find(addr => addr._id === prev._id)) {
+                            return fetchedAddresses[0];
+                        }
+                        return prev; // Keep the current selection if it's still valid
+                    });
+                } else {
+                    setSelectedAddress(null);
                 }
             } else {
-                toast.error(data.message);
+                // Don't show toast for auth errors, just log them silently
+                if(data.message !== "Invalid token" && data.message !== "Unauthorized access" && data.message !== "Token expired"){
+                    toast.error(data.message);
+                }
             }
         } catch (error) {
-            toast.error(error.message);
+            const errorMessage = error.response?.data?.message || error.message;
+            const status = error.response?.status;
+            
+            // Silently handle auth errors - they're expected if user is not authenticated or token is invalid
+            if(status === 401) {
+                // Token might be expired or invalid - don't spam console with errors
+                // The user will need to login again
+                return;
+            }
+            
+            // Only show toast for non-auth errors
+            if(errorMessage !== "Invalid token" && errorMessage !== "Unauthorized access" && errorMessage !== "Token expired"){
+                toast.error(errorMessage);
+            }
         }
     }
 
@@ -65,6 +101,13 @@ const Cart = () => {
                 }
             } else {
                 //place order with Online Payment
+                // Check minimum amount for Stripe (₹0.50)
+                const totalAmount = getCartAmount() + (getCartAmount() * 0.02);
+                if (totalAmount < 0.50) {
+                    toast.error("Minimum order amount for online payment is ₹0.50");
+                    return;
+                }
+
                 try {
                     const { data } = await axios.post('/api/order/stripe', {
                         userId: user._id,
@@ -80,7 +123,8 @@ const Cart = () => {
                     }
                 }
                 catch (error) {
-                    toast.error(error.message);
+                    const errorMessage = error.response?.data?.message || error.message;
+                    toast.error(errorMessage);
                 }
             }
         } catch (error) {
@@ -94,10 +138,12 @@ const Cart = () => {
     }, [cartItems, products]);
 
     useEffect(() => {
-        if (user) {
+        // Only fetch addresses if user is logged in, has a valid ID, and we're on the cart page
+        if (user && user._id && location.pathname === '/cart') {
             getUserAddress();
         }
-    }, [user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, location.pathname]) // Refresh when user changes or when navigating to cart page
 
     return products.length > 0 && cartItems ? (
         <div className="flex flex-col md:flex-row mt-16">
@@ -156,19 +202,36 @@ const Cart = () => {
                 <div className="mb-6">
                     <p className="text-sm font-medium uppercase">Delivery Address</p>
                     <div className="relative flex justify-between items-start mt-2">
-                        <p className="text-gray-500">{selectedAddress ? `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}` : "No address found"}</p>
+                        <p className="text-gray-500">
+                            {selectedAddress 
+                                ? `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}` 
+                                : addresses.length > 0 
+                                    ? "Please select an address" 
+                                    : "No address found"}
+                        </p>
                         <button onClick={() => setShowAddress(!showAddress)} className="text-primary hover:underline cursor-pointer">
-                            Change
+                            {addresses.length > 0 ? "Change" : "Add"}
                         </button>
                         {showAddress && (
-                            <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                                {addresses.map((address, map) => (
-                                    <p onClick={() => { setSelectedAddress(address); setShowAddress(false) }} className="text-gray-500 p-2 hover:bg-gray-100">
-                                        {address.street}, {address.city}, {address.state}, {address.country}
-                                    </p>
-                                ))}
-                                <p onClick={() => navigate("/add-address")} className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10">
-                                    Add address
+                            <div className="absolute top-12 left-0 right-0 z-10 py-1 bg-white border border-gray-300 text-sm shadow-lg rounded">
+                                {addresses.length > 0 ? (
+                                    addresses.map((address, index) => (
+                                        <p 
+                                            key={address._id || index} 
+                                            onClick={() => { 
+                                                setSelectedAddress(address); 
+                                                setShowAddress(false);
+                                            }} 
+                                            className="text-gray-500 p-2 hover:bg-gray-100 cursor-pointer"
+                                        >
+                                            {address.street}, {address.city}, {address.state}, {address.country}
+                                        </p>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 p-2 text-center">No addresses saved</p>
+                                )}
+                                <p onClick={() => { navigate("/add-address"); setShowAddress(false); }} className="text-primary text-center cursor-pointer p-2 hover:bg-primary/10 border-t border-gray-200">
+                                    {addresses.length > 0 ? "Add new address" : "Add address"}
                                 </p>
                             </div>
                         )}

@@ -1,4 +1,4 @@
-import React, { use } from 'react'
+import React from 'react'
 import { useAppContext } from '../context/AppContext';
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';

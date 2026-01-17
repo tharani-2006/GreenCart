@@ -10,7 +10,7 @@ const MyOrders = () => {
 
   const fetchMyOrders = async () => {
     try{
-        const {data} = await axios.get('api/order/user')
+        const {data} = await axios.get('/api/order/user')
         if(data.success){
           setMyOrders(data.orders)
         }
@@ -60,7 +60,7 @@ const MyOrders = () => {
               </div>
 
               <p className='text-primary text-lg font-medium'>
-                Amount: {currency}{item.product.offerprice * (item.quantity || 1)}
+                Amount: {currency}{item.product.offerPrice * (item.quantity || 1)}
               </p>
 
             </div>
