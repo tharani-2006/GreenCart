@@ -11,7 +11,6 @@ import addressRouter from './routes/addressRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import connectCloudinary from './configs/cloudinary.js';
 import { stripeWebhooks } from './controllers/orderController.js';
-
 dotenv.config(); 
 
 const app = express();
@@ -42,3 +41,5 @@ app.use('/api/cart', cartRouter)
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 })
+
+

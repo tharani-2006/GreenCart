@@ -12,3 +12,5 @@ export const updateCart = async (req, res)=>{
     }
 };
 
+//new functioned need to added
+
