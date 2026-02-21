@@ -27,7 +27,7 @@ customer shopping flows, seller dashboards, secure payments, and cloud-hosted me
 
 ---
 
-## 📸 Screenshots & UI Preview
+## Screenshots & UI Preview
 
 <p align="center">
   <!-- Replace this with a real combined UI preview export -->
@@ -39,7 +39,7 @@ customer shopping flows, seller dashboards, secure payments, and cloud-hosted me
 
 ---
 
-## ✨ Features
+## Features
 
 - **Customer features**
   - Browse **categories** and **best‑selling** products
@@ -64,7 +64,7 @@ customer shopping flows, seller dashboards, secure payments, and cloud-hosted me
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 - **Frontend**
   - React (Vite)
@@ -83,7 +83,7 @@ customer shopping flows, seller dashboards, secure payments, and cloud-hosted me
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 greenCart/
@@ -111,7 +111,7 @@ Key frontend modules:
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 - Node.js (LTS recommended)
 - npm or yarn
@@ -121,7 +121,7 @@ Key frontend modules:
 
 ---
 
-## 🔧 Environment Variables
+## Environment Variables
 
 Create a `.env` file in the `server` directory with at least:
 
@@ -153,7 +153,7 @@ and configure Axios / fetch to use this base URL.
 
 ---
 
-## 🧑‍💻 Local Development
+## Local Development
 
 Clone the repository and install dependencies for both client and server.
 
@@ -200,7 +200,7 @@ const allowedOrigins = ['http://localhost:5173'];
 
 ---
 
-## 🚀 Build & Production
+## Build & Production
 
 ### Build the frontend
 
@@ -254,7 +254,7 @@ There are several ways to deploy GreenCart to AWS. A common approach:
 
 ---
 
-## 🔗 API Overview
+## API Overview
 
 The main Express routes (all prefixed by `/api` except `/stripe`):
 
@@ -271,7 +271,7 @@ The main Express routes (all prefixed by `/api` except `/stripe`):
 
 ---
 
-## 📝 Development Notes
+## Development Notes
 
 - **Image uploads**
   - Handled via `multer` and uploaded to Cloudinary under the `greenCart/products` folder
@@ -287,7 +287,7 @@ The main Express routes (all prefixed by `/api` except `/stripe`):
 
 ---
 
-## 📜 Scripts Reference
+## Scripts Reference
 
 ### Client (`client/package.json`)
 
@@ -303,7 +303,7 @@ The main Express routes (all prefixed by `/api` except `/stripe`):
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/your-feature-name`
@@ -313,7 +313,7 @@ The main Express routes (all prefixed by `/api` except `/stripe`):
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the ISC License (see `server/package.json`).  
 You can re‑license or update this for your production needs.
@@ -321,7 +321,7 @@ You can re‑license or update this for your production needs.
 
 ---
 
-## 🎨 Visuals & UX Assets
+## Visuals & UX Assets
 
 > These example references live in `client/src/assets`. Update paths if you move assets or host externally.
 
@@ -341,7 +341,7 @@ You can re‑license or update this for your production needs.
 
 ---
 
-## 🧭 Table of Contents
+## Table of Contents
 
 1. Overview
 2. Features
